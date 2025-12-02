@@ -1,124 +1,88 @@
-# 🔬 Diabetic Retinopathy Detection & Grading Pipeline
+# 👁️ Diabetic Retinopathy Detection System
 
-A comprehensive deep learning pipeline for automated **Diabetic Retinopathy (DR)** detection and severity grading using state-of-the-art computer vision techniques.
+A production-ready deep learning system for automated **Diabetic Retinopathy (DR)** screening using state-of-the-art computer vision and explainable AI.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## 🎯 Highlights
+
+| Feature | Description |
+|---------|-------------|
+| **🏆 High Accuracy** | QWK Score of **0.87** - state-of-the-art performance |
+| **🖥️ Web Interface** | Interactive Streamlit app for easy screening |
+| **🔍 Explainable AI** | Grad-CAM visualizations show model reasoning |
+| **⚡ Fast Inference** | ~3.5 images/second on CPU, faster on GPU |
+| **📦 Production Ready** | FastAPI + Docker for deployment |
 
 ---
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Clinical Background](#-clinical-background)
-- [Dataset](#-dataset)
-- [Installation](#-installation)
+- [Model Performance](#-model-performance)
 - [Quick Start](#-quick-start)
+- [Web Application](#-web-application)
+- [Technical Architecture](#-technical-architecture)
 - [Project Structure](#-project-structure)
-- [Technical Details](#-technical-details)
-- [Usage Guide](#-usage-guide)
-- [Results](#-expected-results)
+- [Training](#-training)
+- [Inference](#-inference)
+- [API Deployment](#-api-deployment)
 - [References](#-references)
-- [License](#-license)
 
 ---
 
-## 🎯 Overview
+## 🔬 Overview
 
-Diabetic Retinopathy is a diabetes complication that affects the eyes and is a leading cause of blindness in working-age adults. Early detection through regular screening is crucial but requires trained specialists, making automated screening tools invaluable.
+Diabetic Retinopathy is a diabetes complication affecting the eyes and a leading cause of blindness. This system provides automated screening by grading retinal fundus images into 5 severity levels:
 
-This pipeline provides:
-- **Automated grading** of fundus images into 5 severity levels
-- **State-of-the-art accuracy** using EfficientNet with custom pooling
-- **Clinical explainability** through Grad-CAM visualizations
-- **Production-ready deployment** with FastAPI and Docker
-
----
-
-## 🏥 Clinical Background
-
-This pipeline grades Diabetic Retinopathy according to the **International Clinical Diabetic Retinopathy (ICDR) Disease Severity Scale**:
-
-| Grade | Severity | Clinical Findings | Action |
-|:-----:|----------|-------------------|--------|
-| **0** | No DR | No visible abnormalities | Annual screening |
-| **1** | Mild NPDR | Microaneurysms only | Annual follow-up |
-| **2** | Moderate NPDR | Microaneurysms + hemorrhages, hard exudates | 6-month follow-up |
-| **3** | Severe NPDR | 4-2-1 Rule: hemorrhages in 4 quadrants, venous beading in 2+ quadrants, IRMA in 1+ quadrant | Refer to ophthalmologist |
-| **4** | Proliferative DR | Neovascularization, vitreous/preretinal hemorrhage | **Urgent referral** |
-
-**NPDR** = Non-Proliferative Diabetic Retinopathy  
-**IRMA** = Intraretinal Microvascular Abnormalities
+| Grade | Name | Severity | Clinical Action |
+|:-----:|------|----------|-----------------|
+| **0** | No DR | Normal | Annual screening |
+| **1** | Mild NPDR | Low | Annual follow-up |
+| **2** | Moderate NPDR | Medium | 6-month follow-up |
+| **3** | Severe NPDR | High | Refer to ophthalmologist |
+| **4** | Proliferative DR | Critical | **Urgent treatment** |
 
 ---
 
-## 📊 Dataset
+## 📊 Model Performance
 
-### APTOS 2019 Blindness Detection Challenge
+### Trained Model Statistics
 
-This project uses the **APTOS 2019** dataset from Kaggle, provided by the **Aravind Eye Hospital** in India.
+| Metric | Value |
+|--------|-------|
+| **Validation QWK** | 0.8646 |
+| **Best QWK (optimized thresholds)** | 0.8716 |
+| **Backbone** | EfficientNet-B5 (Noisy Student) |
+| **Parameters** | 29.4M |
+| **Input Size** | 456 × 456 |
+| **Inference Speed** | ~3.5 img/sec (CPU) |
 
-| Attribute | Value |
-|-----------|-------|
-| **Training Images** | 3,662 |
-| **Image Format** | PNG (various resolutions) |
-| **Classes** | 5 (0-4 severity grades) |
-| **Source** | Aravind Eye Hospital, India |
-| **Challenge** | Kaggle APTOS 2019 |
+### Optimized Thresholds
 
-**Class Distribution:**
-| Grade | Count | Percentage |
-|-------|-------|------------|
-| 0 - No DR | 1,805 | 49.3% |
-| 1 - Mild | 370 | 10.1% |
-| 2 - Moderate | 999 | 27.3% |
-| 3 - Severe | 193 | 5.3% |
-| 4 - Proliferative | 295 | 8.1% |
+The model uses regression with optimized thresholds for better ordinal classification:
 
-### Download Instructions
-
-1. **Get Kaggle API Token:**
-   - Go to [kaggle.com/settings](https://www.kaggle.com/settings)
-   - Click "Create New API Token"
-   - Note your username and API key
-
-2. **Setup credentials in `.env`:**
-   ```env
-   Kaggle_Username=your_kaggle_username
-   Kaggle_API_Token=your_api_token
-   ```
-
-3. **Download the dataset:**
-   - Visit [APTOS 2019 Competition](https://www.kaggle.com/competitions/aptos2019-blindness-detection/data)
-   - Download and extract to `data/aptos/`
-
-### Dataset Citation
-
-```bibtex
-@misc{aptos2019-blindness-detection,
-    author = {APTOS, Aravind Eye Hospital},
-    title = {APTOS 2019 Blindness Detection},
-    publisher = {Kaggle},
-    year = {2019},
-    url = {https://www.kaggle.com/competitions/aptos2019-blindness-detection}
-}
+```
+Grade 0 → 1: 0.5406
+Grade 1 → 2: 1.4384  
+Grade 2 → 3: 2.6956
+Grade 3 → 4: 3.3914
 ```
 
 ---
 
-## 💻 Installation
+## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.10 or higher
-- CUDA-capable GPU (recommended, 8GB+ VRAM)
-- 16GB+ RAM
-
-### Setup
+### 1. Installation
 
 ```powershell
-# Clone/navigate to project directory
-cd "c:\path\to\Diabetic_RetinoPathy"
+# Clone/navigate to project
+cd "Diabetic_RetinoPathy"
 
 # Create virtual environment
 python -m venv venv
@@ -128,74 +92,139 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### Verify Installation
+### 2. Run the Web App
 
 ```powershell
-python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.cuda.is_available()}')"
+streamlit run app.py
 ```
+
+Open http://localhost:8501 in your browser.
+
+### 3. Run Demo Script
+
+```powershell
+python demo_implementation.py
+```
+
+This will:
+- Load the trained model
+- Run predictions on test images
+- Generate Grad-CAM visualizations
+- Save results to `outputs/demo_predictions/`
 
 ---
 
-## 🚀 Quick Start
+## 🖥️ Web Application
 
-### Step 1: Prepare Data
+The Streamlit app provides an interactive interface for DR screening.
 
-Extract the downloaded APTOS dataset to:
-```
-data/
-└── aptos/
-    ├── train.csv
-    ├── test.csv
-    ├── train_images/
-    │   ├── 000c1434d8d7.png
-    │   └── ... (3,662 images)
-    └── test_images/
-```
+### Features
 
-### Step 2: Preprocess Images (Recommended)
+| Page | Description |
+|------|-------------|
+| **🔍 Screening** | Upload images for instant DR grading |
+| **🎓 Demo** | See examples from each DR grade with ground truth comparison |
+| **ℹ️ About** | Model architecture and clinical information |
 
-Apply Ben Graham preprocessing for better results:
+### Running the App
 
 ```powershell
-python scripts/preprocess_images.py --input data/aptos/train_images --output data/aptos/processed --size 512
+# Start the app
+streamlit run app.py
+
+# Or with custom port
+streamlit run app.py --server.port 8080
 ```
 
-This applies:
-- Circular cropping to remove black borders
-- Gaussian blur subtraction for luminosity normalization
-- CLAHE for contrast enhancement
+### App Features
 
-### Step 3: Train Model
+**Screening Page:**
+- Upload fundus images (PNG/JPG)
+- Get instant DR grade prediction
+- View confidence scores
+- See Grad-CAM explainability heatmap
 
-**Quick training (recommended for first run):**
-```powershell
-python train.py --quick --epochs 30 --batch-size 16
+**Demo Page:**
+- One sample from each DR grade (0-4)
+- Ground truth vs. prediction comparison
+- Accuracy metrics and model evaluation
+- Full Grad-CAM visualizations
+
+---
+
+## 🏗️ Technical Architecture
+
+### Model Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    INPUT IMAGE (456×456×3)                    │
+└────────────────────────────┬─────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────────────┐
+│              EFFICIENTNET-B5 (Noisy Student)                  │
+│  • 30M parameters                                             │
+│  • Compound scaling (width=1.6, depth=2.2)                   │
+│  • Pre-trained on ImageNet with semi-supervised learning     │
+│  Output: 2048-channel feature maps                           │
+└────────────────────────────┬─────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   GeM POOLING (p=3.0)                         │
+│  • Learnable generalized mean pooling                        │
+│  • Between avg pooling (p=1) and max pooling (p→∞)          │
+│  Output: 2048-dim vector                                     │
+└────────────────────────────┬─────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    REGRESSION HEAD                            │
+│  • Linear(2048→512) + BatchNorm + ReLU + Dropout(0.5)       │
+│  • Linear(512→1)                                             │
+│  Output: Single value [0, 4]                                 │
+└────────────────────────────┬─────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────────────┐
+│               THRESHOLD CONVERSION                            │
+│  • Optimized thresholds: [0.54, 1.44, 2.70, 3.39]           │
+│  Output: DR Grade [0-4]                                      │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-**With smaller batch size (if GPU memory is limited):**
-```powershell
-python train.py --quick --epochs 30 --batch-size 8 --accumulate 4
+### Why Regression Instead of Classification?
+
+DR grades are **ordinal** (ordered): 0 < 1 < 2 < 3 < 4
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Classification** | Simple | Treats all errors equally |
+| **Regression** ✓ | Respects order, optimizable thresholds | Requires threshold tuning |
+
+### Ben Graham Preprocessing
+
+Industry-standard preprocessing for fundus images (2015 Kaggle DR competition winner):
+
+```
+1. CROP TO SQUARE
+   └── Find fundus region, crop with 5% padding
+
+2. GAUSSIAN BLUR SUBTRACTION  
+   └── I' = 4×I - 4×blur(I) + 128
+   └── Acts as high-pass filter (enhances lesions)
+
+3. CIRCULAR MASK
+   └── Remove edge artifacts, focus on fundus
 ```
 
-**Full training with Hydra config:**
-```powershell
-python train.py
-```
+### Grad-CAM Explainability
 
-### Step 4: Monitor Training
+Visualizes which regions the model focuses on:
 
-In a separate terminal:
-```powershell
-tensorboard --logdir logs
-```
-
-Then open http://localhost:6006 in your browser.
-
-### Step 5: Run Inference
-
-```powershell
-python inference.py --image path/to/fundus_image.png --checkpoint checkpoints/YYYYMMDD_HHMMSS/last.ckpt
-```
+- **🔴 Red/Hot**: High attention (potential lesions)
+- **🔵 Blue/Cold**: Low attention (healthy tissue)
 
 ---
 
@@ -203,224 +232,128 @@ python inference.py --image path/to/fundus_image.png --checkpoint checkpoints/YY
 
 ```
 Diabetic_RetinoPathy/
-├── 📂 conf/                          # Hydra Configuration
-│   ├── config.yaml                   # Main config entry point
-│   ├── dataset/
-│   │   └── aptos.yaml               # APTOS dataset settings
-│   ├── model/
-│   │   ├── efficientnet_b5.yaml     # EfficientNet-B5 config
-│   │   └── efficientnet_b6.yaml     # EfficientNet-B6 config
-│   ├── loss/
-│   │   ├── regression.yaml          # MSE loss config
-│   │   └── classification.yaml      # Focal loss config
-│   └── training/
-│       └── default.yaml             # Training hyperparameters
 │
-├── 📂 data/
-│   └── aptos/                       # ← PUT YOUR DATA HERE
-│       ├── train.csv
-│       ├── train_images/
-│       ├── test_images/
-│       └── processed/               # Preprocessed images
+├── 🚀 MAIN APPLICATIONS
+│   ├── app.py                    # Streamlit web application
+│   ├── demo_implementation.py    # Educational demo script
+│   ├── train.py                  # Training script
+│   └── inference.py              # CLI inference tool
 │
-├── 📂 src/
-│   ├── datamodules/
-│   │   ├── aptos_datamodule.py      # PyTorch Lightning DataModule
-│   │   └── transforms.py            # Albumentations augmentations
-│   ├── models/
-│   │   ├── backbones.py             # EfficientNet + GeM pooling
-│   │   ├── heads.py                 # Regression/Classification heads
-│   │   └── dr_model.py              # Main model class
-│   ├── utils/
-│   │   ├── ben_graham.py            # Ben Graham preprocessing
-│   │   ├── metrics.py               # QWK, confusion matrix
-│   │   └── threshold_optimizer.py   # Optimal threshold finding
-│   ├── xai/
-│   │   └── gradcam.py               # Grad-CAM explainability
-│   └── api/
-│       └── app.py                   # FastAPI deployment
+├── 📂 models/                    # Trained model checkpoints
+│   ├── dr-epoch=04-val_qwk=0.8646.ckpt   # Best model
+│   ├── model_info.json           # Model metadata & thresholds
+│   └── last.ckpt                 # Latest checkpoint
 │
-├── 📂 scripts/
-│   ├── download_data.py             # Kaggle dataset download
-│   └── preprocess_images.py         # Ben Graham preprocessing
+├── 📂 src/                       # Source code
+│   ├── models/                   # Model architecture
+│   ├── datamodules/              # Data loading & transforms
+│   ├── utils/                    # Preprocessing & metrics
+│   ├── xai/                      # Explainability (Grad-CAM)
+│   └── api/                      # FastAPI deployment
 │
-├── 📂 notebooks/
-│   ├── 01_eda.ipynb                 # Exploratory Data Analysis
-│   ├── 02_training.ipynb            # Interactive training guide
-│   └── 03_inference.ipynb           # Inference & visualization
+├── 📂 data/aptos/                # APTOS 2019 dataset
+├── 📂 notebooks/                 # Jupyter notebooks
+├── 📂 outputs/                   # Generated predictions
+├── 📂 logs/                      # Training logs
 │
-├── 📂 checkpoints/                   # Saved model weights
-├── 📂 logs/                          # TensorBoard logs
-│
-├── train.py                         # 🚀 Main training script
-├── inference.py                     # Run predictions
-├── requirements.txt                 # Python dependencies
-├── Dockerfile                       # Docker container
-├── docker-compose.yml               # Docker orchestration
-└── README.md                        # This file
+├── requirements.txt
+├── Dockerfile
+└── README.md
 ```
 
 ---
 
-## 🔧 Technical Details
+## 🎓 Training
 
-### Preprocessing: Ben Graham Method
+### Dataset: APTOS 2019
 
-The Ben Graham preprocessing technique (2015 Kaggle DR competition winner) normalizes retinal images:
+| Attribute | Value |
+|-----------|-------|
+| **Training Images** | 3,662 |
+| **Test Images** | 1,928 |
+| **Source** | Aravind Eye Hospital, India |
 
-```python
-# Pseudocode
-1. Estimate illumination using Gaussian blur (σ = image_size/10)
-2. Subtract blurred image: I' = α*I + β*blur(I) + γ
-3. Apply CLAHE for local contrast enhancement
-4. Crop to circular fundus region
-```
+### Training on Google Colab
 
-### Model Architecture
+Use the provided notebook for free GPU training:
 
-| Component | Choice | Rationale |
-|-----------|--------|-----------|
-| **Backbone** | EfficientNet-B5 | Best accuracy/efficiency trade-off |
-| **Pretrained** | Noisy Student | Better generalization than ImageNet |
-| **Pooling** | GeM (p=3) | Preserves lesion information |
-| **Head** | Regression (1 output) | Respects ordinal nature of grades |
-| **Output** | Continuous [0-4] | Thresholds optimized post-training |
+1. Open `notebooks/04_colab_training.ipynb` in Google Colab
+2. Mount your Google Drive
+3. Upload the dataset
+4. Run all cells
+5. Download trained model to `models/` directory
 
-### Training Strategy
+### Local Training
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| **Optimizer** | AdamW | Weight decay for regularization |
-| **Learning Rate** | 1e-4 | With cosine annealing |
-| **Batch Size** | 16 (effective 32) | Gradient accumulation |
-| **Epochs** | 30 | Early stopping on QWK |
-| **Loss** | MSE | Smooth L1 alternative |
-| **Metric** | Quadratic Weighted Kappa | Penalizes large errors more |
-
-### Augmentations
-
-```python
-# Geometric (safe for fundus)
-- Horizontal/Vertical Flip
-- Rotation (0-360°)
-- Scale (±20%)
-
-# Photometric (moderate)
-- Brightness/Contrast (±20%)
-- Saturation (0.8-1.2x)
-- Hue shift (±10°)  # Small to preserve hemorrhage colors
-
-# Regularization
-- CoarseDropout (30% probability)
+```powershell
+python train.py --quick --epochs 30 --batch-size 16
 ```
 
 ---
 
-## 📖 Usage Guide
+## 🔮 Inference
 
-### Training Options
+### Command Line
 
 ```powershell
-# Quick mode (recommended)
-python train.py --quick
-
-# Custom parameters
-python train.py --quick \
-    --backbone efficientnet_b5 \
-    --epochs 30 \
-    --batch-size 16 \
-    --lr 0.0001 \
-    --image-size 456
-
-# Hydra mode (advanced)
-python train.py training.epochs=50 model=efficientnet_b6
+python inference.py --image path/to/fundus.png
 ```
 
-### Inference
+### Python API
 
-```powershell
-# Single image
-python inference.py --image fundus.png --checkpoint checkpoints/best.ckpt
+```python
+from demo_implementation import DRModel, predict_image
 
-# Batch inference
-python inference.py --input-dir test_images/ --output results.csv
-
-# With TTA (Test Time Augmentation)
-python inference.py --image fundus.png --tta
+result = predict_image("image.png", model, preprocessor, thresholds, device)
+print(f"Grade: {result['predicted_class']}, Confidence: {result['confidence']:.1%}")
 ```
 
-### API Deployment
+---
+
+## 🌐 API Deployment
+
+### Streamlit (Recommended)
 
 ```powershell
-# Start API server
+streamlit run app.py
+```
+
+### FastAPI
+
+```powershell
 uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+```
 
-# Or with Docker
+### Docker
+
+```powershell
 docker-compose up
 ```
-
-API Endpoints:
-- `POST /predict` - Single image prediction
-- `POST /batch-predict` - Multiple images
-- `GET /health` - Health check
-
----
-
-## 📈 Expected Results
-
-| Model | Val QWK | Test QWK | Notes |
-|-------|---------|----------|-------|
-| EfficientNet-B5 | ~0.90 | ~0.88 | Single model |
-| EfficientNet-B6 | ~0.91 | ~0.89 | Higher resolution |
-| 5-Fold Ensemble | ~0.92 | ~0.90 | Competition-level |
-
-**Note:** Results may vary based on preprocessing, augmentation, and random seed.
 
 ---
 
 ## 📚 References
 
-### Papers
-
-1. **EfficientNet**: Tan, M., & Le, Q. (2019). EfficientNet: Rethinking Model Scaling for CNNs. ICML.
-
-2. **Ben Graham Preprocessing**: Graham, B. (2015). Kaggle Diabetic Retinopathy Detection Competition, 1st Place Solution.
-
-3. **Grad-CAM**: Selvaraju, R. R., et al. (2017). Grad-CAM: Visual Explanations from Deep Networks. ICCV.
-
-4. **ICDR Scale**: Wilkinson, C. P., et al. (2003). Proposed International Clinical Diabetic Retinopathy Disease Severity Scale. Ophthalmology.
-
-### Competitions & Datasets
-
-- [APTOS 2019 Blindness Detection](https://www.kaggle.com/competitions/aptos2019-blindness-detection) - Kaggle
-- [Diabetic Retinopathy Detection 2015](https://www.kaggle.com/competitions/diabetic-retinopathy-detection) - Kaggle (EyePACS)
-
-### Acknowledgments
-
-- **Aravind Eye Hospital** for providing the APTOS dataset
-- **Kaggle** for hosting the competition
-- **EyePACS** for the 2015 DR dataset
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- **EfficientNet** - Tan & Le (2019). ICML.
+- **Noisy Student** - Xie et al. (2020). CVPR.
+- **Grad-CAM** - Selvaraju et al. (2017). ICCV.
+- **APTOS 2019** - [Kaggle Competition](https://www.kaggle.com/competitions/aptos2019-blindness-detection)
 
 ---
 
 ## ⚠️ Disclaimer
 
-This tool is intended for **research and educational purposes only**. It is **NOT** a medical device and should **NOT** be used for clinical diagnosis. Always consult qualified healthcare professionals for medical advice.
+This tool is for **screening and educational purposes only**. It is **NOT** a certified medical device. Always consult qualified healthcare professionals.
+
+---
+
+## 📄 License
+
+MIT License
 
 ---
 
 <p align="center">
-  Made with ❤️ for better diabetic eye care
+  Made with ❤️ for better diabetic eye care<br>
+  <strong>Early detection saves sight!</strong>
 </p>
