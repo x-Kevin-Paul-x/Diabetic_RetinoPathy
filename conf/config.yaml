@@ -1,0 +1,48 @@
+# @package _global_
+# Main Hydra configuration entry point for Diabetic Retinopathy Detection
+
+defaults:
+  - dataset: aptos
+  - model: efficientnet_b5
+  - loss: regression
+  - training: default
+  - _self_
+
+# Project paths
+paths:
+  root: ${hydra:runtime.cwd}
+  data_dir: ${paths.root}/data
+  raw_dir: ${paths.data_dir}/raw
+  processed_dir: ${paths.data_dir}/processed
+  splits_dir: ${paths.data_dir}/splits
+  checkpoints_dir: ${paths.root}/checkpoints
+  logs_dir: ${paths.root}/logs
+
+# Experiment settings
+experiment:
+  name: dr_detection
+  seed: 42
+  fold: 0  # 0-4 for 5-fold CV
+  num_folds: 5
+
+# Hardware
+hardware:
+  accelerator: auto  # auto, gpu, cpu, mps
+  devices: 1
+  precision: 16-mixed  # 16-mixed, bf16-mixed, 32
+  num_workers: 4
+
+# Logging
+logging:
+  use_wandb: true
+  wandb_project: diabetic-retinopathy
+  wandb_entity: null  # Set your W&B username
+  log_every_n_steps: 50
+
+# Hydra settings
+hydra:
+  run:
+    dir: ${paths.logs_dir}/${now:%Y-%m-%d_%H-%M-%S}
+  sweep:
+    dir: ${paths.logs_dir}/sweeps/${now:%Y-%m-%d_%H-%M-%S}
+    subdir: ${hydra.job.num}

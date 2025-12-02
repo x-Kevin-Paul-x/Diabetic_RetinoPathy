@@ -1,0 +1,46 @@
+# EfficientNet-B6 Model Configuration
+# Native resolution: 528x528
+# Parameters: ~43M
+# Higher accuracy, more GPU memory required
+
+name: efficientnet_b6
+backbone: tf_efficientnet_b6_ns  # Noisy Student pretrained
+
+# Architecture
+architecture:
+  pretrained: true
+  pretrained_weights: imagenet
+  drop_rate: 0.5
+  drop_path_rate: 0.25
+  
+# Feature extraction
+features:
+  in_features: 2304  # EfficientNet-B6 output channels
+  
+# Pooling strategy
+pooling:
+  type: gem
+  gem_p: 3.0
+  gem_trainable: true
+
+# Head configuration
+head:
+  type: regression
+  hidden_dims: [512]
+  dropout: 0.35
+  output_activation: null
+
+# Regression-specific settings
+regression:
+  output_range: [0.0, 4.0]
+  clip_output: true
+
+# Classification-specific settings
+classification:
+  num_classes: 5
+  label_smoothing: 0.1
+
+# Ordinal regression settings
+ordinal:
+  num_classes: 5
+  link_function: logit

@@ -1,0 +1,80 @@
+# Default Training Configuration
+
+name: default
+
+# Training hyperparameters
+epochs: 30
+batch_size: 16
+accumulate_grad_batches: 2  # Effective batch size = 32
+
+# Learning rate
+learning_rate: 1e-4
+min_learning_rate: 1e-7
+
+# Optimizer
+optimizer:
+  name: adamw
+  weight_decay: 1e-4
+  betas: [0.9, 0.999]
+  eps: 1e-8
+
+# Learning rate scheduler
+scheduler:
+  name: cosine_annealing_warm_restarts  # Options: cosine, cosine_warm_restarts, reduce_on_plateau, one_cycle
+  
+  # Cosine Annealing with Warm Restarts
+  T_0: 10  # First restart period
+  T_mult: 2  # Period multiplier after each restart
+  eta_min: ${training.min_learning_rate}
+  
+  # Warmup
+  warmup_epochs: 2
+  warmup_start_lr: 1e-6
+  
+  # ReduceLROnPlateau settings (if using)
+  plateau:
+    mode: max
+    factor: 0.5
+    patience: 3
+    threshold: 0.001
+
+# Early stopping
+early_stopping:
+  enabled: true
+  monitor: val_qwk
+  mode: max
+  patience: 7
+  min_delta: 0.001
+
+# Model checkpointing
+checkpoint:
+  monitor: val_qwk
+  mode: max
+  save_top_k: 3
+  save_last: true
+  filename: "{epoch:02d}-{val_qwk:.4f}"
+
+# Gradient settings
+gradient:
+  clip_val: 1.0
+  clip_algorithm: norm  # Options: norm, value
+
+# Stochastic Weight Averaging (optional)
+swa:
+  enabled: false
+  start_epoch: 20
+  lr: 1e-5
+  anneal_epochs: 5
+
+# Test-Time Augmentation
+tta:
+  enabled: true
+  transforms: ["none", "hflip", "vflip", "hflip_vflip"]
+  merge_mode: mean  # Options: mean, max, gmean
+
+# Mixed precision training
+mixed_precision: true
+
+# Reproducibility
+deterministic: true
+benchmark: false  # Set True for speed if input sizes are constant

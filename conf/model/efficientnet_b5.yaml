@@ -1,0 +1,46 @@
+# EfficientNet-B5 Model Configuration
+# Native resolution: 456x456
+# Parameters: ~30M
+# Best balance of accuracy and efficiency for DR detection
+
+name: efficientnet_b5
+backbone: tf_efficientnet_b5_ns  # Noisy Student pretrained
+
+# Architecture
+architecture:
+  pretrained: true
+  pretrained_weights: imagenet  # Options: imagenet, noisy-student
+  drop_rate: 0.4
+  drop_path_rate: 0.2
+  
+# Feature extraction
+features:
+  in_features: 2048  # EfficientNet-B5 output channels
+  
+# Pooling strategy
+pooling:
+  type: gem  # Options: avg, max, gem, concat_avg_max
+  gem_p: 3.0  # Learnable parameter, initialized to 3
+  gem_trainable: true
+
+# Head configuration
+head:
+  type: regression  # Options: regression, classification, ordinal
+  hidden_dims: [512]  # Hidden layers before output
+  dropout: 0.3
+  output_activation: null  # null for regression, softmax for classification
+
+# Regression-specific settings
+regression:
+  output_range: [0.0, 4.0]  # DR grade range
+  clip_output: true
+  
+# Classification-specific settings (if head.type == classification)
+classification:
+  num_classes: 5
+  label_smoothing: 0.1
+
+# Ordinal regression settings (if head.type == ordinal)
+ordinal:
+  num_classes: 5
+  link_function: logit  # Options: logit, probit

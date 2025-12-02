@@ -1,0 +1,41 @@
+# Regression Loss Configuration
+# SOTA approach: Treat ordinal classification as regression
+# Naturally enforces ordinal relationship via squared error penalty
+
+name: regression
+
+# Primary loss function
+primary:
+  type: smooth_l1  # Options: mse, smooth_l1, huber
+  beta: 1.0  # Smooth L1 transition point
+  reduction: mean
+
+# Alternative: MSE Loss
+mse:
+  reduction: mean
+
+# Huber Loss (alternative to Smooth L1)
+huber:
+  delta: 1.0
+  reduction: mean
+
+# Auxiliary losses (optional, can be combined)
+auxiliary:
+  use_classification_aux: false  # Add CE loss as regularization
+  classification_weight: 0.1
+  
+  use_ordinal_aux: false  # Add ordinal ranking loss
+  ordinal_weight: 0.1
+
+# Label processing for regression
+label_processing:
+  normalize: false  # Normalize labels to [0, 1]
+  add_noise: false  # Add small noise for regularization
+  noise_std: 0.1
+
+# Threshold optimization (post-training)
+threshold_optimization:
+  enabled: true
+  method: scipy  # Options: scipy, optuna
+  metric: quadratic_kappa
+  initial_thresholds: [0.5, 1.5, 2.5, 3.5]

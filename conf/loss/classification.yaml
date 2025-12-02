@@ -1,0 +1,35 @@
+# Classification Loss Configuration
+# Alternative approach with Focal Loss for class imbalance
+
+name: classification
+
+# Primary loss function
+primary:
+  type: focal  # Options: cross_entropy, focal, weighted_ce
+  
+# Focal Loss settings (for handling class imbalance)
+focal:
+  alpha: null  # Per-class weights, null for balanced
+  gamma: 2.0  # Focusing parameter (higher = more focus on hard examples)
+  reduction: mean
+  label_smoothing: 0.1
+
+# Cross Entropy settings
+cross_entropy:
+  weight: null  # Will be set from dataset.class_weights
+  label_smoothing: 0.1
+  reduction: mean
+
+# Weighted Cross Entropy
+weighted_ce:
+  use_dataset_weights: true  # Use weights from dataset config
+  reduction: mean
+
+# Auxiliary losses
+auxiliary:
+  use_regression_aux: false  # Add MSE loss for ordinal consistency
+  regression_weight: 0.2
+
+# Threshold optimization (not typically needed for classification)
+threshold_optimization:
+  enabled: false
